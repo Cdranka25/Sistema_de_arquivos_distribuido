@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, Response
+from flask import Flask, request, redirect, Response, render_template
 import requests
 
 app = Flask(__name__)
@@ -8,20 +8,7 @@ MASTER_URL = "http://localhost:5000"
 
 @app.route("/")
 def home():
-    return """
-    <h1>Cliente - Sistema de Arquivos Distribuído</h1>
-
-    <h2>Upload de Arquivo</h2>
-
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Enviar">
-    </form>
-
-    <h2>Arquivos</h2>
-
-    <a href="/files">Listar Arquivos</a>
-    """
+    return render_template("index.html")
 
 
 @app.route("/upload", methods=["POST"])
@@ -56,6 +43,7 @@ def download(filename):
             "Content-Disposition": f"attachment; filename={filename}"
         }
     )
+
 
 if __name__ == "__main__":
     app.run(port=4000)

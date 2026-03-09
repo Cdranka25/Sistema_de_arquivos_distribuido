@@ -4,9 +4,9 @@ import os
 processes = []
 
 services = [
-    ("nodes/01_node", "server.py"),
-    ("nodes/02_node", "server.py"),
-    ("nodes/03_node", "server.py"),
+    ("nodes/01_node", "01_server_node.py"),
+    ("nodes/02_node", "02_server_node.py"),
+    ("nodes/03_node", "03_server_node.py"),
     ("master", "master.py"),
     ("client", "client.py"),
 ]

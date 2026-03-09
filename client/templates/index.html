@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Arquivos Distribuído</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Senhor dos Arquivos</h1>
+        <p>Sistema de Arquivos Distribuído</p>
+    </header>
+
+    <div class="card">
+
+        <h2>Upload de Arquivo</h2>
+
+        <form action="/upload" method="post" enctype="multipart/form-data">
+
+            <label class="file-input">
+                Selecionar Arquivo
+                <input type="file" name="file">
+            </label>
+
+            <button type="submit">Enviar Arquivo</button>
+
+        </form>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Arquivos Armazenados</h2>
+
+        <a class="button-secondary" href="/files">
+            Listar Arquivos
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

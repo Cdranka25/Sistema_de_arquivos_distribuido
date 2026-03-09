@@ -14,9 +14,6 @@ Projeto de sistema de arquivos distribuidos, inspirado no DropBox
 *Objetivo:*
     Garantir tolerância a falhas e alta disponibilidade dos dados dentro do sistema de arquivos distribuído.
 
-**Tecnologias Utilizadas:**
-    Python, Flask Framework, HTTP, Requests Library.
-
 *Funcionamento:*
     Quando um usuário envia um arquivo para o sistema através do cliente, o servidor Master recebe o arquivo e seleciona nós de armazenamento disponíveis. O arquivo é então replicado em dois nós diferentes.
 
