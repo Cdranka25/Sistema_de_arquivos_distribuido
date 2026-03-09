@@ -1,75 +1,287 @@
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: linear-gradient(135deg, #f4f6f8, #e9edf2);
+
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #f5f7fa, #e4e8ef);
+
     margin: 0;
     padding: 0;
+
 }
 
 .container {
-    width: 500px;
-    margin: 80px auto;
+
+    max-width: 900px;
+    margin: auto;
+    padding: 40px;
+
+}
+
+header {
+
     text-align: center;
+    margin-bottom: 40px;
+
 }
 
 header h1 {
-    margin-bottom: 5px;
+
+    font-size: 32px;
     color: #2c3e50;
+
 }
 
 header p {
+
     color: #7f8c8d;
-    margin-bottom: 40px;
+
+}
+
+.grid {
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
 }
 
 .card {
+
     background: white;
     padding: 30px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    border-radius: 12px;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+
 }
 
-h2 {
-    margin-bottom: 20px;
+.card h2 {
+
+    margin-top: 0;
     color: #34495e;
+
 }
 
-.file-input {
+.drop-area {
+
     display: block;
+
     border: 2px dashed #3498db;
-    padding: 15px;
-    border-radius: 8px;
+
+    padding: 30px;
+    border-radius: 10px;
+
     cursor: pointer;
-    margin-bottom: 15px;
+
+    transition: 0.2s;
+
 }
 
-.file-input input {
+.drop-area:hover {
+
+    background: #f2f9ff;
+
+}
+
+.drop-area p {
+
+    margin: 0;
+    font-weight: bold;
+
+}
+
+.drop-area span {
+
+    font-size: 13px;
+    color: #888;
+
+}
+
+.drop-area input {
+
     display: none;
+
 }
 
 button {
+
+    margin-top: 15px;
+
     background: #3498db;
-    color: white;
     border: none;
-    padding: 10px 18px;
-    border-radius: 6px;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    color: white;
     font-size: 14px;
+
     cursor: pointer;
+
+    transition: 0.2s;
+
 }
 
 button:hover {
+
     background: #2980b9;
+
 }
 
 .button-secondary {
-    display: inline-block;
+
     background: #2ecc71;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 6px;
-    text-decoration: none;
+
 }
 
 .button-secondary:hover {
+
     background: #27ae60;
+
+}
+
+ul {
+
+    list-style: none;
+    padding: 0;
+
+    margin-top: 20px;
+
+}
+
+li {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 10px;
+
+    border-bottom: 1px solid #eee;
+
+}
+
+li a {
+
+    text-decoration: none;
+
+    color: #3498db;
+    font-weight: bold;
+
+}
+
+.drop-area.drag {
+
+    background: #eaf6ff;
+    border-color: #2980b9;
+
+}
+
+#selectedFiles {
+
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+
+}
+
+#selectedFiles li {
+
+    padding: 6px;
+    font-size: 14px;
+    color: #34495e;
+
+}
+
+.drop-area.drag {
+
+    background: #eaf6ff;
+    border-color: #2980b9;
+
+}
+
+.file-actions {
+
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+}
+
+.file-actions button {
+
+    background: #e74c3c;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+
+}
+
+.file-actions button:hover {
+
+    background: #c0392b;
+
+}
+
+/* ===== ANIMAÇÕES ===== */
+
+@keyframes fadeSlideIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+/* cards aparecem suavemente */
+
+.card {
+    animation: fadeSlideIn 0.6s ease;
+}
+
+/* arquivos aparecem suavemente */
+
+li {
+    animation: fadeSlideIn 0.3s ease;
+}
+
+/* drag area animada */
+
+.drop-area.drag {
+
+    background: #eaf6ff;
+    border-color: #2980b9;
+
+    transform: scale(1.02);
+
+}
+
+/* botão com micro animação */
+
+button {
+
+    transition: all 0.2s ease;
+
+}
+
+button:hover {
+
+    transform: translateY(-1px);
+
+}
+
+/* botão excluir animado */
+
+.file-actions button:hover {
+
+    transform: scale(1.05);
+
 }

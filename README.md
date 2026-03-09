@@ -1,14 +1,23 @@
 # Sistema de Arquivos Distribuído
 
-Este projeto implementa um Sistema de Arquivos Distribuído, inspirado em programas como DropBox ou Google Drive.
+Este projeto implementa um **Sistema de Arquivos Distribuído**, inspirado em serviços como **Dropbox** e **Google Drive**.
 
-O sistema permite o armazenamento e recuperação de arquivos utilizando múltiplos nós de armazenamento distribuídos. A arquitetura do sistema foi projetada para garantir disponibilidade, escalabilidade e tolerância a falhas.
+O sistema permite o **armazenamento, replicação e recuperação de arquivos** utilizando múltiplos nós de armazenamento distribuídos.
 
-O sistema utiliza comunicação baseada em HTTP, permitindo que diferentes componentes do sistema se comuniquem através de requisições REST.
+A arquitetura foi projetada para oferecer:
+
+- Alta disponibilidade
+- Tolerância a falhas
+- Replicação automática de dados
+- Escalabilidade
+
+A comunicação entre os componentes do sistema é realizada através de **requisições HTTP utilizando uma API REST**.
 
 ---
 
-## Arquitetura do Sistema
+# Arquitetura do Sistema
+
+O sistema é composto por quatro tipos principais de componentes:
 
     O sistema é composto por quatro tipos principais de componentes:
 
@@ -24,69 +33,153 @@ O sistema utiliza comunicação baseada em HTTP, permitindo que diferentes compo
 
 ---
 
-### Client
+# Client
 
-Responsável pela interface com o usuário, permitindo:
+O **Client** é responsável pela interface com o usuário.
+
+Ele fornece uma interface web que permite:
 
 - Upload de arquivos
-- Listagem de arquivos
+- Listagem de arquivos armazenados
 - Download de arquivos
+- Exclusão de arquivos
+- Upload por arrastar e soltar (Drag and Drop)
 
-O cliente se comunica com o Master através de requisições HTTP.
+O Client envia todas as requisições ao **Master**, que coordena as operações do sistema.
 
 ---
 
-### Master
+# Master
 
-O servidor Master atua como coordenador do sistema, sendo responsável por:
+O servidor **Master** atua como coordenador central do sistema distribuído.
+
+Ele é responsável por:
 
 - Receber requisições do cliente
 - Distribuir arquivos entre os nós de armazenamento
-- Executar o algoritmo de balanceamento de carga
-- Localizar arquivos durante operações de download
+- Manter o metadata do sistema
+- Garantir o fator de replicação dos arquivos
+- Monitorar a disponibilidade dos nós
+- Recuperar arquivos durante operações de download
+- Propagar exclusões de arquivos entre os nós
 
-O Master utiliza o algoritmo Round-Robin para distribuição de arquivos entre os nós.
+O Master mantém um arquivo de metadata persistente: metadata.json
+Esse arquivo armazena a relação entre **arquivos e os nós que possuem suas cópias**.
 
 ---
 
-### Nodes
+# Nodes
 
-Os nós de armazenamento são responsáveis por:
+Os **Nodes** são responsáveis pelo armazenamento físico dos arquivos.
 
-- Armazenar arquivos recebidos
+Cada node executa um servidor Flask independente e fornece endpoints HTTP para:
+
+- Receber uploads de arquivos
 - Fornecer arquivos para download
-- Responder requisições de listagem de arquivos
-- Participar do algoritmo de eleição de líder
+- Listar arquivos armazenados
+- Excluir arquivos
 
-Cada node executa um servidor Flask independente.
-
----
-
-## Algoritmos Utilizados
-
-- Data Replication: garante que os arquivos existam em mais de um node.
-- Round-Robin: Distribui os arquivos entre os nós de forma sequencial.
-- Algoritmo Bully: Caso o server de um dos nós falhe, os demais nós detectam a falha e iniciam um processo de eleição. O nó com maior id assume automaticamente.
+Cada node mantém seu próprio diretório local de armazenamento.
 
 ---
 
-## Tecnologias Utilizadas
+# Replicação de Dados
 
-- Python
-- Flask Framework
-- Requests Library
-- HTTP / REST API
+Para garantir tolerância a falhas, o sistema utiliza **replicação de arquivos**.
+
+O fator de replicação é definido pela constante: REPLICATION_FACTOR = 2
+Isso significa que **cada arquivo será armazenado em pelo menos dois nós diferentes**.
+
+Se uma réplica for perdida (por falha de um node), o Master executa automaticamente a recriação da réplica em outro node disponível.
 
 ---
 
-## Como Executar o Sistema
+# Monitoramento de Nós
 
-*Executar no Terminal:* python run_system.py
-Este comando irá iniciar:
+O Master realiza verificações periódicas de disponibilidade dos nodes através do endpoint: /status
 
-- Client
+Nodes que não respondem são temporariamente removidos da lista de nodes ativos.
+Isso evita que o sistema tente enviar arquivos para servidores indisponíveis.
+
+---
+
+# Monitoramento de Replicação
+
+Uma rotina chamada **Replication Monitor** verifica continuamente se todos os arquivos mantêm o número mínimo de réplicas.
+
+Caso um arquivo possua menos réplicas que o definido pelo sistema, o Master automaticamente:
+
+1. Seleciona um node que possui o arquivo
+2. Copia o arquivo para outro node disponível
+
+Isso garante que o sistema mantenha sempre o nível correto de redundância.
+
+---
+
+# Reconstrução de Metadata
+
+Caso o arquivo `metadata.json` seja perdido ou corrompido, o sistema pode reconstruir automaticamente o metadata.
+
+Durante a inicialização do Master:
+
+1. Cada node é consultado
+2. Os arquivos armazenados em cada node são listados
+3. O Master reconstrói a estrutura de metadata do sistema
+
+---
+
+# Exclusão Distribuída
+
+Quando um usuário solicita a exclusão de um arquivo:
+
+1. A requisição é enviada ao Master
+2. O Master identifica todos os nodes que armazenam o arquivo
+3. O Master envia requisições de exclusão para esses nodes
+4. O arquivo é removido do metadata do sistema
+
+---
+
+# Execução Concorrente
+
+Operações de rede entre Master e nodes são executadas de forma **concorrente**, permitindo:
+
+- Upload mais rápido
+- Replicação mais eficiente
+- Exclusão paralela de arquivos
+
+Isso reduz significativamente o tempo de resposta do sistema.
+
+---
+
+# Tecnologias Utilizadas
+
+- **Python**
+- **Flask Framework**
+- **Requests Library**
+- **HTTP / REST API**
+- **JavaScript (Frontend)**
+- **HTML / CSS**
+
+---
+
+# Como Executar o Sistema
+
+Execute no terminal: python run_system.py
+Esse comando iniciará automaticamente:
+
 - Master
 - Nodes de armazenamento
+- Client Web
 
-Acesso através do navegador:
-<http://localhost:4000>
+---
+
+# Acesso ao Sistema
+
+Abra o navegador em: http://localhost:4000/
+
+A partir da interface web será possível:
+
+- Enviar arquivos
+- Listar arquivos armazenados
+- Baixar arquivos
+- Excluir arquivos

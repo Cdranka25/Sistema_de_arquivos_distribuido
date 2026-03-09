@@ -1,47 +1,68 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
+    <meta charset="UTF-8">
+
     <title>Sistema de Arquivos Distribuído</title>
+
     <link rel="stylesheet" href="/static/style.css">
+
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <header>
-        <h1>Senhor dos Arquivos</h1>
-        <p>Sistema de Arquivos Distribuído</p>
-    </header>
+        <header>
 
-    <div class="card">
+            <h1>Senhor dos Arquivos</h1>
+            <p>Sistema de Arquivos Distribuído</p>
 
-        <h2>Upload de Arquivo</h2>
+        </header>
 
-        <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="grid">
 
-            <label class="file-input">
-                Selecionar Arquivo
-                <input type="file" name="file">
-            </label>
+            <div class="card">
 
-            <button type="submit">Enviar Arquivo</button>
+                <h2>Upload de Arquivos</h2>
 
-        </form>
+                <form id="uploadForm">
+
+                    <label class="drop-area" id="dropArea">
+
+                        <p>Arraste arquivos aqui</p>
+                        <span>ou clique para selecionar</span>
+
+                        <input type="file" name="file" id="fileInput" multiple>
+
+                    </label>
+
+                    <ul id="selectedFiles"></ul>
+
+                    <button type="submit">Enviar Arquivos</button>
+
+                </form>
+
+            </div>
+
+            <div class="card">
+
+                <h2>Arquivos Armazenados</h2>
+
+                <button onclick="listarArquivos()" class="button-secondary">
+                    Atualizar Lista
+                </button>
+
+                <ul id="fileList"></ul>
+
+            </div>
+
+        </div>
 
     </div>
-
-    <div class="card">
-
-        <h2>Arquivos Armazenados</h2>
-
-        <a class="button-secondary" href="/files">
-            Listar Arquivos
-        </a>
-
-    </div>
-
-</div>
-
+    <script src="/static/app.js"></script>
 </body>
+
 </html>
