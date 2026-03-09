@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import requests
 
 app = Flask(__name__)
@@ -41,6 +41,47 @@ def upload():
         "node": node,
         "node_response": response.text
     })
+
+
+@app.route("/files")
+def list_files():
+
+    all_files = []
+
+    for node in NODES:
+        try:
+            r = requests.get(f"{node}/files")
+
+            if r.status_code == 200:
+                all_files.extend(r.json())
+
+        except:
+            pass
+
+    return jsonify(all_files)
+
+
+@app.route("/download/<filename>")
+def download(filename):
+
+    for node in NODES:
+
+        try:
+            r = requests.get(f"{node}/download/{filename}", stream=True)
+
+            if r.status_code == 200:
+                return Response(
+                    r.iter_content(chunk_size=1024),
+                    content_type=r.headers["Content-Type"],
+                    headers={
+                        "Content-Disposition": f"attachment; filename={filename}"
+                    }
+                )
+
+        except:
+            continue
+
+    return {"error": "Arquivo não encontrado"}, 404
 
 
 if __name__ == "__main__":

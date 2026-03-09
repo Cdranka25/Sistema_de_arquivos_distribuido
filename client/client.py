@@ -1,61 +1,61 @@
+from flask import Flask, request, redirect, Response
 import requests
+
+app = Flask(__name__)
 
 MASTER_URL = "http://localhost:5000"
 
-def upload_file():
 
-    path = input("Caminho do arquivo: ")
+@app.route("/")
+def home():
+    return """
+    <h1>Cliente - Sistema de Arquivos Distribuído</h1>
 
-    with open(path, "rb") as f:
-        files = {"file": f}
+    <h2>Upload de Arquivo</h2>
 
-        r = requests.post(f"{MASTER_URL}/upload", files=files)
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Enviar">
+    </form>
 
-    print(r.text)
+    <h2>Arquivos</h2>
 
-
-def list_files():
-
-    r = requests.get(f"{MASTER_URL}/files")
-
-    print("Arquivos no sistema:")
-    print(r.text)
-
-
-def download_file():
-
-    name = input("Nome do arquivo: ")
-
-    r = requests.get(f"{MASTER_URL}/download/{name}")
-
-    with open(name, "wb") as f:
-        f.write(r.content)
-
-    print("Download concluído")
+    <a href="/files">Listar Arquivos</a>
+    """
 
 
-def menu():
+@app.route("/upload", methods=["POST"])
+def upload():
 
-    while True:
+    file = request.files["file"]
 
-        print("\n1 - Upload")
-        print("2 - Listar arquivos")
-        print("3 - Download")
-        print("4 - Sair")
+    files = {"file": (file.filename, file.stream)}
 
-        op = input("> ")
+    response = requests.post(f"{MASTER_URL}/upload", files=files)
 
-        if op == "1":
-            upload_file()
-
-        elif op == "2":
-            list_files()
-
-        elif op == "3":
-            download_file()
-
-        elif op == "4":
-            break
+    return response.text
 
 
-menu()
+@app.route("/files")
+def files():
+
+    response = requests.get(f"{MASTER_URL}/files")
+
+    return str(response.json())
+
+
+@app.route("/download/<filename>")
+def download(filename):
+
+    r = requests.get(f"{MASTER_URL}/download/{filename}", stream=True)
+
+    return Response(
+        r.iter_content(chunk_size=1024),
+        content_type=r.headers["Content-Type"],
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}"
+        }
+    )
+
+if __name__ == "__main__":
+    app.run(port=4000)
