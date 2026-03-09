@@ -10,7 +10,13 @@ MASTER_URL = "http://localhost:5000"
 NODES = {
     1: "http://localhost:5001",
     2: "http://localhost:5002",
-    3: "http://localhost:5003"
+    3: "http://localhost:5003",
+    4: "http://localhost:5004",
+    5: "http://localhost:5005",
+    6: "http://localhost:5006",
+    7: "http://localhost:5007",
+    8: "http://localhost:5008",
+    9: "http://localhost:5009"
 }
 
 app = Flask(__name__)

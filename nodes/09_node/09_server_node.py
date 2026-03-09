@@ -4,7 +4,7 @@ import requests
 import threading
 import time
 
-NODE_ID = 3
+NODE_ID = 9
 MASTER_URL = "http://localhost:5000"
 
 NODES = {
@@ -60,6 +60,7 @@ def start_election():
     if not responded:
         become_master()
 
+
 def become_master():
     print(f"Node {NODE_ID} virou o novo MASTER")
 
@@ -102,5 +103,5 @@ def status():
 
 
 if __name__ == "__main__":
-    threading.Thread(target=check_master).start()    
-    app.run(port=5003)
+    threading.Thread(target=check_master).start()
+    app.run(port=5009)

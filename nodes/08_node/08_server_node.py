@@ -4,7 +4,7 @@ import requests
 import threading
 import time
 
-NODE_ID = 3
+NODE_ID = 8
 MASTER_URL = "http://localhost:5000"
 
 NODES = {
@@ -103,4 +103,4 @@ def status():
 
 if __name__ == "__main__":
     threading.Thread(target=check_master).start()    
-    app.run(port=5003)
+    app.run(port=5008)
