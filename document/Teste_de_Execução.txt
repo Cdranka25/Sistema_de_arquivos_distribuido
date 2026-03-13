@@ -1,0 +1,9 @@
+python master/master.py
+
+python nodes/01_node/01_server_node.py
+
+python nodes/02_node/02_server_node.py
+
+python nodes/03_node/03_server_node.py
+
+python client/client.py

@@ -68,6 +68,22 @@ class Node:
         @self.app.route("/status")
         def status():
             return jsonify({"status": "online"})
+        
+        
+        @self.app.route("/simulate-failure", methods=["POST"])
+        def simulate_failure():
+
+            print(f"Node {self.NODE_ID} desligando...")
+
+            def shutdown():
+                time.sleep(1)
+                os._exit(0)
+
+            threading.Thread(target=shutdown).start()
+
+            return jsonify({"message": "Node desligando"})
+
+
 
     def check_master(self):
 

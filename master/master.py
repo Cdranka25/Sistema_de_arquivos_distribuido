@@ -1,13 +1,27 @@
-
-from flask import Flask, request, jsonify, Response
-import requests
-import random
-import threading
-import time
-import json
+import sys
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 from cluster_config import get_node_list, REPLICATION_FACTOR
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import json
+import time
+import threading
+import random
+import requests
+from flask import Flask, request, jsonify, Response
+import sys
+import os
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 
 app = Flask(__name__)
 
@@ -225,11 +239,36 @@ def delete(filename):
     return jsonify({"message": "Arquivo removido"})
 
 
+@app.route("/stop-node/<int:node_id>", methods=["POST"])
+def stop_node(node_id):
+
+    if node_id not in range(1, len(NODES) + 1):
+        return jsonify({"error": "Node inválido"}), 400
+
+    node_url = NODES[node_id - 1]
+
+    ok = _stop_node(node_url)
+
+    if ok:
+        log(f"Node {node_id} desligado manualmente")
+        return jsonify({"message": f"Node {node_id} parado"})
+    else:
+        return jsonify({"error": "Falha ao parar node"}), 500
+
+
 def _delete_file_on_node(node, filename, timeout=5):
     try:
         requests.delete(f"{node}/delete/{filename}", timeout=timeout)
     except requests.RequestException:
         pass
+
+
+def _stop_node(node, timeout=3):
+    try:
+        r = requests.post(f"{node}/simulate-failure", timeout=timeout)
+        return r.status_code == 200
+    except requests.RequestException:
+        return False
 
 
 def replication_monitor():
