@@ -31,17 +31,18 @@ class Node:
 
             file = request.files["file"]
 
+            if file.filename == "":
+                return jsonify({"error": "Nome do arquivo vazio"}), 400
+
             path = os.path.join(self.STORAGE, file.filename)
 
             file.save(path)
 
             return jsonify({"message": "Arquivo salvo"})
 
-
         @self.app.route("/files")
         def files():
             return jsonify(os.listdir(self.STORAGE))
-
 
         @self.app.route("/download/<filename>")
         def download(filename):
@@ -52,7 +53,6 @@ class Node:
                 return jsonify({"error": "Arquivo não encontrado"}), 404
 
             return send_from_directory(self.STORAGE, filename, as_attachment=True)
-
 
         @self.app.route("/delete/<filename>", methods=["DELETE"])
         def delete(filename):
@@ -65,11 +65,9 @@ class Node:
 
             return jsonify({"error": "Arquivo não encontrado"}), 404
 
-
         @self.app.route("/status")
         def status():
             return jsonify({"status": "online"})
-
 
     def check_master(self):
 
@@ -85,7 +83,6 @@ class Node:
                 print("Master caiu")
 
             time.sleep(5)
-
 
     def run(self):
 

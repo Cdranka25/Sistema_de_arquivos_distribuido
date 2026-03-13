@@ -1,133 +1,107 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const dropArea = document.getElementById("dropArea");
+  const fileInput = document.getElementById("fileInput");
+  const selectedFiles = document.getElementById("selectedFiles");
+  const form = document.getElementById("uploadForm");
 
-    const dropArea = document.getElementById("dropArea")
-    const fileInput = document.getElementById("fileInput")
-    const selectedFiles = document.getElementById("selectedFiles")
-    const form = document.getElementById("uploadForm")
+  let files = [];
 
-    let files = []
+  console.log("Cliente carregado");
 
-    console.log("Cliente carregado")
+  function renderFiles() {
+    selectedFiles.innerHTML = "";
 
-    function renderFiles() {
+    files.forEach((file) => {
+      const li = document.createElement("li");
+      li.textContent = file.name;
 
-        selectedFiles.innerHTML = ""
+      li.style.opacity = "0";
 
-        files.forEach(file => {
+      setTimeout(() => {
+        li.style.opacity = "1";
+      }, 10);
 
-            const li = document.createElement("li")
-            li.textContent = file.name
+      selectedFiles.appendChild(li);
+    });
+  }
 
-            li.style.opacity = "0"
+  fileInput.addEventListener("change", (e) => {
+    files = Array.from(e.target.files);
+    renderFiles();
+  });
 
-            setTimeout(() => {
-                li.style.opacity = "1"
-            }, 10)
+  dropArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropArea.classList.add("drag");
+  });
 
-            selectedFiles.appendChild(li)
+  dropArea.addEventListener("dragleave", () => {
+    dropArea.classList.remove("drag");
+  });
 
-        })
+  dropArea.addEventListener("drop", (e) => {
+    e.preventDefault();
 
+    dropArea.classList.remove("drag");
+
+    files = Array.from(e.dataTransfer.files);
+
+    renderFiles();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (files.length === 0) {
+      alert("Selecione um arquivo primeiro");
+      return;
     }
 
-    fileInput.addEventListener("change", e => {
+    console.log("Enviando arquivos...");
 
-        files = Array.from(e.target.files)
-        renderFiles()
+    try {
 
-    })
+      const uploads = files.map((file) => {
+        const formData = new FormData();
+        formData.append("file", file);
 
-    dropArea.addEventListener("dragover", e => {
+        return fetch("/upload", {
+          method: "POST",
+          body: formData,
+        });
+      });
 
-        e.preventDefault()
-        dropArea.classList.add("drag")
+      const responses = await Promise.all(uploads);
 
-    })
+      for (const r of responses) {
+        const text = await r.text();
+        console.log(text);
+      }
 
-    dropArea.addEventListener("dragleave", () => {
+      alert("Upload concluído!");
 
-        dropArea.classList.remove("drag")
+      files = [];
+      renderFiles();
 
-    })
+      listarArquivos();
+    } catch (error) {
+      console.error("Erro no upload:", error);
+      alert("Erro no upload");
+    }
+  });
 
-    dropArea.addEventListener("drop", e => {
+  function listarArquivos() {
+    fetch("/files")
+      .then((res) => res.json())
+      .then((files) => {
+        const lista = document.getElementById("fileList");
 
-        e.preventDefault()
+        lista.innerHTML = "";
 
-        dropArea.classList.remove("drag")
+        files.forEach((file) => {
+          const li = document.createElement("li");
 
-        files = Array.from(e.dataTransfer.files)
-
-        renderFiles()
-
-    })
-
-    form.addEventListener("submit", async e => {
-
-        e.preventDefault()
-
-        if (files.length === 0) {
-            alert("Selecione um arquivo primeiro")
-            return
-        }
-
-        console.log("Enviando arquivos...")
-
-        try {
-
-            // upload paralelo (muito mais rápido)
-            const uploads = files.map(file => {
-
-                const formData = new FormData()
-                formData.append("file", file)
-
-                return fetch("/upload", {
-                    method: "POST",
-                    body: formData
-                })
-
-            })
-
-            const responses = await Promise.all(uploads)
-
-            for (const r of responses) {
-
-                const text = await r.text()
-                console.log(text)
-
-            }
-
-            alert("Upload concluído!")
-
-            files = []
-            renderFiles()
-
-            listarArquivos()
-
-        } catch (error) {
-
-            console.error("Erro no upload:", error)
-            alert("Erro no upload")
-
-        }
-
-    })
-
-    function listarArquivos() {
-
-        fetch("/files")
-            .then(res => res.json())
-            .then(files => {
-
-                const lista = document.getElementById("fileList")
-
-                lista.innerHTML = ""
-
-                files.forEach(file => {
-
-                    const li = document.createElement("li")
-
-                    li.innerHTML = `
+          li.innerHTML = `
                         <span>${file}</span>
 
                         <div class="file-actions">
@@ -137,57 +111,43 @@ document.addEventListener("DOMContentLoaded", () => {
                         Excluir
                         </button>
                         </div>
-                        `
+                        `;
 
-                    li.style.opacity = "0"
-                    lista.appendChild(li)
+          li.style.opacity = "0";
+          lista.appendChild(li);
 
-                    setTimeout(() => {
-                        li.style.opacity = "1"
-                    }, 10)
+          setTimeout(() => {
+            li.style.opacity = "1";
+          }, 10);
+        });
+      })
+      .catch((err) => {
+        console.error("Erro ao listar arquivos", err);
+      });
+  }
 
-                })
-
-            })
-            .catch(err => {
-
-                console.error("Erro ao listar arquivos", err)
-
-            })
-
+  function excluirArquivo(filename) {
+    if (!confirm("Deseja realmente excluir este arquivo?")) {
+      return;
     }
 
-    function excluirArquivo(filename) {
+    fetch(`/delete/${filename}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
 
-        if (!confirm("Deseja realmente excluir este arquivo?")) {
-            return
-        }
+        listarArquivos();
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Erro ao excluir arquivo");
+      });
+  }
 
-        fetch(`/delete/${filename}`, {
-            method: "DELETE"
-        })
-            .then(res => res.json())
-            .then(data => {
+  window.excluirArquivo = excluirArquivo;
+  window.listarArquivos = listarArquivos;
 
-                console.log(data)
-
-                listarArquivos()
-
-            })
-            .catch(err => {
-
-                console.error(err)
-                alert("Erro ao excluir arquivo")
-
-            })
-
-    }
-
-    window.excluirArquivo = excluirArquivo
-    // disponibiliza globalmente para o botão HTML
-    window.listarArquivos = listarArquivos
-
-    // carrega lista automaticamente ao abrir página
-    listarArquivos()
-
-})
+  listarArquivos();
+});

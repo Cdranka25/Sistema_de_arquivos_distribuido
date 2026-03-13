@@ -64,7 +64,6 @@ def status():
 
 
 def check_node_once(node, timeout=2):
-    """Checa um node; retorna (node, alive_bool)."""
     try:
         r = requests.get(f"{node}/status", timeout=timeout)
         return node, r.status_code == 200
@@ -73,7 +72,6 @@ def check_node_once(node, timeout=2):
 
 
 def health_check_loop(poll_interval=5, timeout=2):
-    """Thread que atualiza ALIVE_NODES periodicamente, checando em paralelo."""
     global ALIVE_NODES
     while True:
         try:
@@ -104,7 +102,6 @@ def get_alive_nodes_snapshot():
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    """Recebe do client/browser. Replica em paralelo para nodes vivos."""
     if "file" not in request.files:
         return jsonify({"error": "Nenhum arquivo enviado"}), 400
 
@@ -162,7 +159,6 @@ def upload():
 
 
 def _post_file_to_node(node, filename, file_bytes, timeout=6):
-    """Helper que envia bytes para um node e retorna True/False."""
     try:
         files = {"file": (filename, file_bytes)}
         r = requests.post(f"{node}/upload", files=files, timeout=timeout)
@@ -237,7 +233,6 @@ def _delete_file_on_node(node, filename, timeout=5):
 
 
 def replication_monitor():
-    """Monitora réplicas e replica para nodes extras em background (paralelo)."""
     while True:
         for filename, nodes in list(metadata.items()):
             alive_nodes = get_alive_nodes_snapshot()

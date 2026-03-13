@@ -1,68 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
-<head>
-
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
 
     <title>Sistema de Arquivos Distribuído</title>
 
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
 
-</head>
-
-<body>
-
+  <body>
     <div class="container">
+      <header>
+        <h1>Senhor dos Arquivos</h1>
+        <p>Sistema de Arquivos Distribuído</p>
+      </header>
 
-        <header>
+      <div class="grid">
+        <div class="card">
+          <h2>Upload de Arquivos</h2>
 
-            <h1>Senhor dos Arquivos</h1>
-            <p>Sistema de Arquivos Distribuído</p>
+          <form id="uploadForm">
+            <label class="drop-area" id="dropArea">
+              <p>Arraste arquivos aqui</p>
+              <span>ou clique para selecionar</span>
 
-        </header>
+              <input type="file" name="file" id="fileInput" multiple />
+            </label>
 
-        <div class="grid">
+            <ul id="selectedFiles"></ul>
 
-            <div class="card">
-
-                <h2>Upload de Arquivos</h2>
-
-                <form id="uploadForm">
-
-                    <label class="drop-area" id="dropArea">
-
-                        <p>Arraste arquivos aqui</p>
-                        <span>ou clique para selecionar</span>
-
-                        <input type="file" name="file" id="fileInput" multiple>
-
-                    </label>
-
-                    <ul id="selectedFiles"></ul>
-
-                    <button type="submit">Enviar Arquivos</button>
-
-                </form>
-
-            </div>
-
-            <div class="card">
-
-                <h2>Arquivos Armazenados</h2>
-
-                <button onclick="listarArquivos()" class="button-secondary">
-                    Atualizar Lista
-                </button>
-
-                <ul id="fileList"></ul>
-
-            </div>
-
+            <button type="submit">Enviar Arquivos</button>
+          </form>
         </div>
 
+        <div class="card">
+          <h2>Arquivos Armazenados</h2>
+
+          <button onclick="listarArquivos()" class="button-secondary">
+            Atualizar Lista
+          </button>
+
+          <ul id="fileList"></ul>
+        </div>
+      </div>
     </div>
     <script src="/static/app.js"></script>
-</body>
-
+  </body>
 </html>
